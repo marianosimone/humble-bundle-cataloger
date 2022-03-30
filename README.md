@@ -15,7 +15,6 @@ A simple way to go from a Humble Bundle collection JSON to a website
 ## WIP
 These are things that are not done, but I want to add before promoting this tool too much:
 
-- [ ] Move the fixes list into its own file
 - [ ] Add support for other types of media (e.g. videos, audio)
 - [ ] Add type annotations
 - [ ] See if getting the Humble Bundle json can be automated (or at least easier)

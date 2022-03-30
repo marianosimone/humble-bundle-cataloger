@@ -10,3 +10,13 @@ A simple way to go from a Humble Bundle collection JSON to a website
 - Take the response, and save it as `humble_catalog.json`
 - Run `python3 process.py`
 - Take `catalog.html` and `img` and publish it however you'd like
+
+## WIP
+These are things that are not done, but I want to add before promoting this tool:
+
+- [ ] Move the recommended list into a file that is not commited
+- [ ] Move the fixes list into its own file
+- [ ] Add support for other types of media (e.g. videos, audio)
+- [ ] Add type annotations
+- [ ] See if getting the Humble Bundle json can be automated (or at least easier)
+- [ ] Think about a better option when no URL or Image are present

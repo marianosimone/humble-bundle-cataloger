@@ -8,6 +8,7 @@
             }
             div.empty_icon {
                 height: 68px;
+                width: 68px;
                 background: gray;
                 border-radius: 15px;
             }
@@ -32,81 +33,89 @@
         <h1>My List</h1>
         <div>
         Find
-            <a href="#Games">🕹 Games</a>,
-            <a href="#Books">📚 Books</a>, and
-            <a href="#3DModels">🛠 3D Models</a>
+            <ul>
+                {% if games|length -%}<li><a href="#Games">🕹 Games</a></li>{% endif -%}
+                {% if books|length -%}<li><a href="#Books">📚 Books</a></li>{% endif -%}
+                {% if models|length -%}<li><a href="#3DModels">🛠 3D Models</a></li>{% endif -%}
+            </ul>
         </div>
-        <a id="Games"><h2>🕹 Games</h2></a>
-        <ul>
-            <li>If a game has a <img class="platform" src="img/steam.svg"/>, it means that I have a Steam key (but you'll have to check Steam to know compatibility)</li>
-            <li>If a game has platform icon, it means that I have a downloadable version of it in that platform</li>
-            <li>If a game has a ⭐, I've played it and really enjoyed it</li>
-        </ul>
-        <table>
-            <thead>
-                <tr>
-                    <td></td>
-                    <td>Name</td>
-                    <td>Platforms</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for game in games-%}
-                <tr>
-                    <td>
-                        {% if game.icon %}
-                            <img src="{{game.icon}}"/>
-                        {% else -%}
-                            <div class="empty_icon"/>
-                        {% endif -%}
-                    <td>
-                        <a href="{% if game.url -%}{{game.url}}{% else -%}https://store.steampowered.com/search/?term={{game.name}}{% endif -%}">{{game.name}}</a> {% if game.recommended -%}⭐{% endif -%}
-                    </td>
-                    <td>
-                        {% for p in game.platforms -%}
-                            <img class="platform" src="img/{{p}}.svg"/>
-                        {% endfor -%}
-                        {% if game.has_steam_key -%}
-                            <img class="platform" src="img/steam.svg"/>
-                        {% endif -%}
-                    </td>
-                </tr>
-                {% endfor -%}
-            </tbody>
-        </table>
 
-        <a id="Books"><h2>📚 Books</h2></a>
-        <table>
-            <thead>
-                <tr>
-                    <td></td>
-                    <td>Name</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for book in books -%}
-                <tr>
-                    <td>
-                        {% if book.icon %}
-                            <img src="{{book.icon}}"/>
-                        {% else -%}
-                            <div class="empty_icon"/>
-                        {% endif -%}
-                    <td>
-                        {% if book.url -%}
-                            <a href="{{book.url}}">{{book.name}}</a>
-                        {% else %}
-                            {{book.name}}
-                        {% endif -%}
-                        {% if book.author -%}
-                            <span class="byline">by {{book.author}}</span>
-                        {% endif -%}
-                    </td>
-                </tr>
-                {% endfor -%}
-            </tbody>
-        </table>
+        {% if games|length -%}
+            <a id="Games"><h2>🕹 Games</h2></a>
+            <ul>
+                <li>If a game has a <img class="platform" src="img/steam.svg"/>, it means that I have a Steam key (but you'll have to check Steam to know compatibility)</li>
+                <li>If a game has platform icon, it means that I have a downloadable version of it in that platform</li>
+                <li>If a game has a ⭐, I've played it and really enjoyed it</li>
+            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>Name</td>
+                        <td>Platforms</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in games -%}
+                    <tr>
+                        <td>
+                            {% if game.icon %}
+                                <img src="{{game.icon}}"/>
+                            {% else -%}
+                                <div class="empty_icon"/>
+                            {% endif -%}
+                        <td>
+                            <a href="{% if game.url -%}{{game.url}}{% else -%}https://store.steampowered.com/search/?term={{game.name}}{% endif -%}">{{game.name}}</a> {% if game.recommended -%}⭐{% endif -%}
+                        </td>
+                        <td>
+                            {% for p in game.platforms -%}
+                                <img class="platform" src="img/{{p}}.svg"/>
+                            {% endfor -%}
+                            {% if game.has_steam_key -%}
+                                <img class="platform" src="img/steam.svg"/>
+                            {% endif -%}
+                        </td>
+                    </tr>
+                    {% endfor -%}
+                </tbody>
+            </table>
+        {% endif -%}
 
+        {% if books|length -%}
+            <a id="Books"><h2>📚 Books</h2></a>
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>Name</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books -%}
+                    <tr>
+                        <td>
+                            {% if book.icon %}
+                                <img src="{{book.icon}}"/>
+                            {% else -%}
+                                <div class="empty_icon"/>
+                            {% endif -%}
+                        <td>
+                            {% if book.url -%}
+                                <a href="{{book.url}}">{{book.name}}</a>
+                            {% else %}
+                                {{book.name}}
+                            {% endif -%}
+                            {% if book.author -%}
+                                <span class="byline">by {{book.author}}</span>
+                            {% endif -%}
+                        </td>
+                    </tr>
+                    {% endfor -%}
+                </tbody>
+            </table>
+        {% endif -%}
+
+        {% if models|length -%}
         <a id="3DModels"><h2>🛠 3D Models</h2></a>
         <table>
             <thead>
@@ -135,6 +144,7 @@
                 {% endfor -%}
             </tbody>
         </table>
+        {% endif -%}
         <footer>
             Built with <a href="https://github.com/marianosimone/humble-bundle-cataloger">Humble Bundle Cataloger</a> -
             <a href="http://fontawesome.io">Font Awesome</a> by Dave Gandy

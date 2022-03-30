@@ -20,3 +20,4 @@ These are things that are not done, but I want to add before promoting this tool
 - [ ] Add type annotations
 - [ ] See if getting the Humble Bundle json can be automated (or at least easier)
 - [ ] Think about a better option when no URL or Image are present
+- [ ] Add filters by platform/Steam only

@@ -12,9 +12,8 @@ A simple way to go from a Humble Bundle collection JSON to a website
 - Take `catalog.html` and `img` and publish it however you'd like
 
 ## WIP
-These are things that are not done, but I want to add before promoting this tool:
+These are things that are not done, but I want to add before promoting this tool too much:
 
-- [ ] Move the recommended list into a file that is not commited
 - [ ] Move the fixes list into its own file
 - [ ] Add support for other types of media (e.g. videos, audio)
 - [ ] Add type annotations

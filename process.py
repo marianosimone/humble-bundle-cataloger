@@ -5,7 +5,6 @@ from jinja2 import Environment, FileSystemLoader
 import json
 
 
-
 TYPES_TO_IGNORE = [
     ['audio'], # these are soundtracks
     ['video'], # these are movies
@@ -39,27 +38,14 @@ FIXES = {
     'The Inner World Soundtrack': 'The Inner World',
 }
 
-# This is just my list of recommended games... Feel free to change it ;)
-RECOMMENDED = [
-    'Aragami',
-    'Day of the Tentacle Remastered',
-    'FEZ',
-    'Grim Fandango Remastered',
-    'Guacamelee! Gold Edition',
-    'Gunpoint',
-    'Hollow Knight',
-    'Human Resource Machine',
-    'Ironclad Tactics',
-    'Keep Talking and Nobody Explodes',
-    'Kingdom Classic',
-    'LIMBO',
-    'Machinarium',
-    'Mark of the Ninja',
-    'Osmos',
-    'Psychonauts',
-    'This War of Mine',
-    'Trine 2: Complete Story',
-]
+
+# This is just my list of recommended entries... Feel free to change it ;)
+try:
+    with open('recommended.txt', 'r') as recommended:
+        RECOMMENDED = set(map(lambda l: l.strip(), recommended))
+except Exception as e:
+    print("Couldn't find `recommended.txt`, create one if you want to highlight any entries")
+    RECOMMENDED = set()
 
 
 class Item:

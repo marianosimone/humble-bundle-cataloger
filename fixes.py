@@ -7,6 +7,7 @@ FIXES = {
     "Assault Android Cactus": "Assault Android Cactus+",
     "Automate the Boring Stuff with Python": "Automate the Boring Stuff with Python: Practical Programming for Total Beginners",
     "Brutal Legend": "Brütal Legend",
+    "Double Fine Adventure Documentary": "Double Fine Adventure",
     "Dusty Revenge: Co-op Edition": "Dusty Revenge: Co-Op Edition",
     "EarthNight Wallpapers": "EarthNight",
     "Framed Collection": "FRAMED Collection",

@@ -24,10 +24,11 @@ except Exception as e:
 
 
 class Item:
-    def __init__(self, name, icon, url):
+    def __init__(self, name, icon, url, recommended):
         self.name = name
         self.icon = icon
         self.url = url
+        self.recommended = recommended
 
     def __eq__(self, other):
         return self.name == other.name
@@ -37,15 +38,14 @@ class Item:
 
 
 class Book(Item):
-    def __init__(self, name, icon, url, author):
-        super().__init__(name, icon, url)
+    def __init__(self, name, icon, url, author, recommended):
+        super().__init__(name, icon, url, recommended)
         self.author = author
 
 
 class Game(Item):
     def __init__(self, name, icon, url, recommended, platforms, has_steam_key):
-        super().__init__(name, icon, url)
-        self.recommended = recommended
+        super().__init__(name, icon, url, recommended)
         self.platforms = platforms
         self.has_steam_key = has_steam_key
 
@@ -65,20 +65,21 @@ def extract_subproduct(subproduct):
     name = FIXES.get(subproduct["human_name"], subproduct["human_name"])
     url = subproduct["url"]
     type_of_item = detect_type(subproduct["downloads"])
+    recommended = name in RECOMMENDED
 
     if type_of_item in TYPES_TO_IGNORE:
         return None
     if type_of_item == ["other"]:
-        return PrintableModel(name, icon, url)
+        return PrintableModel(name, icon, url, recommended)
     if type_of_item == ["ebook"]:
-        return Book(name, icon, url, subproduct["payee"]["human_name"])
+        return Book(name, icon, url, subproduct["payee"]["human_name"], recommended)
 
     # if we are here, we can "safely" assume that we are dealing with a game
     platforms = sorted(
         set([i for i in type_of_item if i not in ["audio", "ebook", "asmjs"]])
     )
     if platforms:
-        return Game(name, icon, url, name in RECOMMENDED, platforms, False)
+        return Game(name, icon, url, recommended, platforms, False)
 
 
 def detect_type(downloads):

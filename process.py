@@ -6,7 +6,6 @@ import json
 from fixes import FIXES
 
 TYPES_TO_IGNORE = [
-    ["audio"],  # these are soundtracks
     ["video"],  # these are movies
     [],  # there are cases which are expired or otherwise unredeemable
 ]
@@ -50,6 +49,10 @@ class Game(Item):
         self.has_steam_key = has_steam_key
 
 
+class Soundtrack(Item):
+    pass
+
+
 class PrintableModel(Item):
     pass
 
@@ -73,6 +76,8 @@ def extract_subproduct(subproduct):
         return PrintableModel(name, icon, url, recommended)
     if type_of_item == ["ebook"]:
         return Book(name, icon, url, subproduct["payee"]["human_name"], recommended)
+    if type_of_item == ["audio"]:
+        return Soundtrack(name, icon, url, recommended)
 
     # if we are here, we can "safely" assume that we are dealing with a game
     platforms = sorted(
@@ -138,6 +143,7 @@ def generate_report(data):
         books=sorted(set(data[Book]), key=lambda b: b.name),
         games=sorted(set(data[Game]), key=lambda g: g.name),
         models=sorted(set(data[PrintableModel]), key=lambda g: g.name),
+        soundtracks=sorted(set(data[Soundtrack]), key=lambda g: g.name),
     )
     with open("catalog.html", "w") as file:
         file.write(template)

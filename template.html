@@ -27,6 +27,19 @@
                 padding: 0.5em 1em 0.5em 1em;
             }
         </style>
+        <script>
+            const filterByPlatform = (platform) => {
+                document.querySelectorAll('tr.game').forEach(row => {
+                    console.log(row.classList.contains(platform));
+
+                    if (row.classList.contains(platform)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            };
+        </script>
         <link href="/your-path-to-fontawesome/css/brands.css" rel="stylesheet">
     </head>
     <body>
@@ -49,6 +62,11 @@
                 <li>If a game has a <img class="platform" src="img/steam.svg"/>, it means that I have a Steam key (but you'll have to check Steam to know compatibility)</li>
                 <li>If a game has platform icon, it means that I have a downloadable version of it in that platform</li>
             </ul>
+            Show:
+            <a href="#" onClick="filterByPlatform('all');">all</a>,
+            {% for platform in ['android', 'linux', 'mac', 'steam', 'windows'] -%}
+                <img onClick="filterByPlatform('{{platform}}');" class="platform" src="img/{{platform}}.svg"/>
+            {% endfor -%}
             <table>
                 <thead>
                     <tr>
@@ -59,7 +77,7 @@
                 </thead>
                 <tbody>
                     {% for game in games -%}
-                    <tr>
+                    <tr class="game all {% if game.has_steam_key -%}steam {% endif -%} {{game.platforms|join(' ')}}">
                         <td>
                             {% if game.icon %}
                                 <img src="{{game.icon}}"/>

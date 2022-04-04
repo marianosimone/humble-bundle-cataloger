@@ -138,13 +138,13 @@ def get_data() -> dict[Type[Item], list[Item]]:
     extracted_steam_games = chain.from_iterable(
         map(extract_steam_game, d["tpkd_dict"]["all_tpks"]) for d in data
     )
-    typed_data_by_name = {d.name: d for d in subproduct_data if d}
+    typed_data_by_name = {(type(d), d.name): d for d in subproduct_data if d}
     games_by_existing = group_by(
-        lambda n: n in typed_data_by_name, extracted_steam_games
+        lambda n: (Game, n) in typed_data_by_name, extracted_steam_games
     )
 
     for name in games_by_existing[True]:
-        game = typed_data_by_name[name]
+        game = typed_data_by_name[(Game, name)]
         if isinstance(game, Game):
             game.has_steam_key = True
         else:

@@ -80,11 +80,12 @@
                     {% for game in games -%}
                     <tr class="game all {% if game.has_steam_key -%}steam {% endif -%} {{game.platforms|join(' ')}}">
                         <td>
-                            {% if game.icon %}
+                            {% if game.icon -%}
                                 <img src="{{game.icon}}"/>
                             {% else -%}
                                 <div class="empty_icon"/>
                             {% endif -%}
+                        </td>
                         <td>
                             <a href="{% if game.url -%}{{game.url}}{% else -%}https://store.steampowered.com/search/?term={{game.name}}{% endif -%}">{{game.name}}</a> {% if game.recommended -%}⭐{% endif -%}
                         </td>
@@ -115,15 +116,16 @@
                     {% for book in books -%}
                     <tr>
                         <td>
-                            {% if book.icon %}
+                            {% if book.icon -%}
                                 <img src="{{book.icon}}"/>
                             {% else -%}
                                 <div class="empty_icon"/>
                             {% endif -%}
+                        </td>
                         <td>
                             {% if book.url -%}
                                 <a href="{{book.url}}">{{book.name}}</a>
-                            {% else %}
+                            {% else -%}
                                 {{book.name}}
                             {% endif -%}
                             {% if book.author -%}
@@ -150,15 +152,16 @@
                 {% for model in models -%}
                 <tr>
                     <td>
-                        {% if model.icon %}
+                        {% if model.icon -%}
                             <img src="{{model.icon}}"/>
                         {% else -%}
                             <div class="empty_icon"/>
                         {% endif -%}
+                    </td>
                     <td>
                         {% if model.url -%}
                             <a href="{{model.url}}">{{model.name}}</a>
-                        {% else %}
+                        {% else -%}
                             {{model.name}}
                         {% endif -%}
                         {% if model.recommended -%}⭐{% endif -%}
@@ -182,15 +185,16 @@
                 {% for soundtrack in soundtracks -%}
                 <tr>
                     <td>
-                        {% if soundtrack.icon %}
+                        {% if soundtrack.icon -%}
                             <img src="{{soundtrack.icon}}"/>
                         {% else -%}
                             <div class="empty_icon"/>
                         {% endif -%}
+                    </td>
                     <td>
                         {% if soundtrack.url -%}
                             <a href="{{soundtrack.url}}">{{soundtrack.name}}</a>
-                        {% else %}
+                        {% else -%}
                             {{soundtrack.name}}
                         {% endif -%}
                         {% if soundtrack.recommended -%}⭐{% endif -%}
@@ -215,11 +219,12 @@
                     {% for program in software -%}
                     <tr>
                         <td>
-                            {% if program.icon %}
+                            {% if program.icon -%}
                                 <img src="{{program.icon}}"/>
                             {% else -%}
                                 <div class="empty_icon"/>
                             {% endif -%}
+                        </td>
                         <td>
                             <a href="{% if program.url -%}{{program.url}}{% else -%}https://duckduckgo.com/?q={{program.name}}{% endif -%}">{{program.name}}</a> {% if program.recommended -%}⭐{% endif -%}
                         </td>

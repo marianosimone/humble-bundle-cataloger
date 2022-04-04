@@ -4,6 +4,7 @@ from itertools import chain
 from jinja2 import Environment, FileSystemLoader
 import json
 from fixes import FIXES
+from typing import Any, Callable, Iterable, Optional, Type, TypeVar
 
 TYPES_TO_IGNORE = [
     ["video"],  # these are movies
@@ -70,13 +71,20 @@ class PrintableModel(Item):
     pass
 
 
-def groupBy(key, seq):
-    return reduce(
-        lambda grp, val: grp[key(val)].append(val) or grp, seq, defaultdict(list)
-    )
+GroupByKey = TypeVar("GroupByKey")
+GroupByType = TypeVar("GroupByType")
 
 
-def extract_subproduct(subproduct):
+def group_by(
+    key: Callable[[GroupByType], GroupByKey], seq: Iterable[GroupByType]
+) -> dict[GroupByKey, list[GroupByType]]:
+    result = defaultdict(list)
+    for item in seq:
+        result[key(item)].append(item)
+    return result
+
+
+def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
     icon = subproduct["icon"]
     name = FIXES.get(subproduct["human_name"], subproduct["human_name"])
     url = subproduct["url"]
@@ -100,13 +108,14 @@ def extract_subproduct(subproduct):
         if name in NON_GAMES:
             return Software(name, icon, url, recommended, platforms)
         return Game(name, icon, url, recommended, platforms, False)
+    return None
 
 
-def detect_type(downloads):
+def detect_type(downloads: list[dict[str, str]]) -> list[str]:
     return [d["platform"] for d in downloads]
 
 
-def extract_steam_game(tpkd):
+def extract_steam_game(tpkd: dict[str, str]) -> Optional[str]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
     is_expired = tpkd["is_expired"]
     key_type = tpkd["key_type"]
@@ -116,9 +125,10 @@ def extract_steam_game(tpkd):
 
     if is_steam and not is_expired and not redeemed and not is_gift:
         return name
+    return None
 
 
-def get_data():
+def get_data() -> dict[Type[Item], list[Item]]:
     with open("humble_catalog.json", "r") as file:
         data = json.load(file).values()
 
@@ -129,12 +139,20 @@ def get_data():
         map(extract_steam_game, d["tpkd_dict"]["all_tpks"]) for d in data
     )
     typed_data_by_name = {d.name: d for d in subproduct_data if d}
-    games_by_existing = groupBy(
+    games_by_existing = group_by(
         lambda n: n in typed_data_by_name, extracted_steam_games
     )
 
-    for game in games_by_existing[True]:
-        typed_data_by_name[game].has_steam_key = True
+    for name in games_by_existing[True]:
+        game = typed_data_by_name[name]
+        if isinstance(game, Game):
+            game.has_steam_key = True
+        else:
+            print(
+                "Expected {} to be a game to set `has_steam_game`, but it wasn't ({})".format(
+                    name, game
+                )
+            )
 
     just_steam_games = [
         Game(n, "", "", n in RECOMMENDED, [], True)
@@ -142,11 +160,7 @@ def get_data():
         if n
     ]
 
-    return groupBy(type, chain(typed_data_by_name.values(), just_steam_games))
-
-
-def render_template(data):
-    return
+    return group_by(type, chain(typed_data_by_name.values(), just_steam_games))
 
 
 def generate_report(data):

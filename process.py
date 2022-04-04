@@ -21,6 +21,13 @@ except Exception as e:
     )
     RECOMMENDED = set()
 
+# This are known entries in Humble Bundle that are not games, but Software utils/packages
+try:
+    with open("non_games.txt", "r") as non_games:
+        NON_GAMES = set(map(lambda l: l.strip(), non_games))
+except Exception as e:
+    NON_GAMES = set()
+
 
 class Item:
     def __init__(self, name, icon, url, recommended):
@@ -47,6 +54,12 @@ class Game(Item):
         super().__init__(name, icon, url, recommended)
         self.platforms = platforms
         self.has_steam_key = has_steam_key
+
+
+class Software(Item):
+    def __init__(self, name, icon, url, recommended, platforms):
+        super().__init__(name, icon, url, recommended)
+        self.platforms = platforms
 
 
 class Soundtrack(Item):
@@ -79,11 +92,13 @@ def extract_subproduct(subproduct):
     if type_of_item == ["audio"]:
         return Soundtrack(name, icon, url, recommended)
 
-    # if we are here, we can "safely" assume that we are dealing with a game
+    # if we are here, we can "safely" assume that we are dealing with a game or software
     platforms = sorted(
         set([i for i in type_of_item if i not in ["audio", "ebook", "asmjs"]])
     )
     if platforms:
+        if name in NON_GAMES:
+            return Software(name, icon, url, recommended, platforms)
         return Game(name, icon, url, recommended, platforms, False)
 
 
@@ -144,6 +159,7 @@ def generate_report(data):
         games=sorted(set(data[Game]), key=lambda g: g.name),
         models=sorted(set(data[PrintableModel]), key=lambda g: g.name),
         soundtracks=sorted(set(data[Soundtrack]), key=lambda g: g.name),
+        software=sorted(set(data[Software]), key=lambda g: g.name),
     )
     with open("catalog.html", "w") as file:
         file.write(template)

@@ -51,6 +51,7 @@
                 {% if books|length -%}<li><a href="#Books">📚 Books</a></li>{% endif -%}
                 {% if models|length -%}<li><a href="#3DModels">🛠 3D Models</a></li>{% endif -%}
                 {% if soundtracks|length -%}<li><a href="#Soundtracks">🎵 Soundtracks</a></li>{% endif -%}
+                {% if software|length -%}<li><a href="#Software">💻 Software</a></li>{% endif -%}
             </ul>
             If an entry has a ⭐, I've played/seen/read/listened to it and really enjoyed it
 
@@ -198,6 +199,39 @@
                 {% endfor -%}
             </tbody>
         </table>
+        {% endif -%}
+
+        {% if software|length -%}
+            <a id="Software"><h2>💻 Software</h2></a>
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>Name</td>
+                        <td>Platforms</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for program in software -%}
+                    <tr>
+                        <td>
+                            {% if program.icon %}
+                                <img src="{{program.icon}}"/>
+                            {% else -%}
+                                <div class="empty_icon"/>
+                            {% endif -%}
+                        <td>
+                            <a href="{% if program.url -%}{{program.url}}{% else -%}https://duckduckgo.com/?q={{program.name}}{% endif -%}">{{program.name}}</a> {% if program.recommended -%}⭐{% endif -%}
+                        </td>
+                        <td>
+                            {% for p in program.platforms -%}
+                                <img class="platform" src="img/{{p}}.svg"/>
+                            {% endfor -%}
+                        </td>
+                    </tr>
+                    {% endfor -%}
+                </tbody>
+            </table>
         {% endif -%}
 
         <footer>

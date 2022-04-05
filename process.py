@@ -52,10 +52,9 @@ class Book(Item):
 
 
 class Game(Item):
-    def __init__(self, name, icon, url, recommended, platforms, has_steam_key):
+    def __init__(self, name, icon, url, recommended, platforms):
         super().__init__(name, icon, url, recommended)
         self.platforms = platforms
-        self.has_steam_key = has_steam_key
 
 
 class Software(Item):
@@ -108,7 +107,7 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
     if platforms:
         if name in NON_GAMES:
             return Software(name, icon, url, recommended, platforms)
-        return Game(name, icon, url, recommended, platforms, False)
+        return Game(name, icon, url, recommended, platforms)
     return None
 
 
@@ -141,28 +140,18 @@ def get_data() -> dict[Type[Item], list[Item]]:
         map(extract_steam_game, d["tpkd_dict"]["all_tpks"]) for d in data
     )
     typed_data_by_name = {(type(d), d.name): d for d in subproduct_data if d}
-    games_by_existing = group_by(
-        lambda n: (Game, n) in typed_data_by_name, extracted_steam_games
-    )
 
-    for name in games_by_existing[True]:
-        game = typed_data_by_name[(Game, name)]
-        if isinstance(game, Game):
-            game.has_steam_key = True
+    for name in extracted_steam_games:
+        if not name:
+            continue
+        key = (Game, name)
+        game = typed_data_by_name.get(key)
+        if isinstance(game, Game) and "steam" not in game.platforms:
+            game.platforms = sorted(game.platforms + ["steam"])
         else:
-            print(
-                "Expected {} to be a game to set `has_steam_game`, but it wasn't ({})".format(
-                    name, game
-                )
-            )
+            typed_data_by_name[key] = Game(name, "", "", name in RECOMMENDED, ["steam"])
 
-    just_steam_games = [
-        Game(n, "", "", n in RECOMMENDED, [], True)
-        for n in games_by_existing[False]
-        if n
-    ]
-
-    return group_by(type, chain(typed_data_by_name.values(), just_steam_games))
+    return group_by(type, typed_data_by_name.values())
 
 
 def generate_report(data):

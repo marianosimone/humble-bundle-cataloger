@@ -78,7 +78,7 @@
                 </thead>
                 <tbody>
                     {% for game in games -%}
-                    <tr class="game all {% if game.has_steam_key -%}steam {% endif -%} {{game.platforms|join(' ')}}">
+                    <tr class="game all {{game.platforms|join(' ')}}">
                         <td>
                             {% if game.icon -%}
                                 <img src="{{game.icon}}"/>
@@ -93,9 +93,6 @@
                             {% for p in game.platforms -%}
                                 <img class="platform" src="img/{{p}}.svg"/>
                             {% endfor -%}
-                            {% if game.has_steam_key -%}
-                                <img class="platform" src="img/steam.svg"/>
-                            {% endif -%}
                         </td>
                     </tr>
                     {% endfor -%}

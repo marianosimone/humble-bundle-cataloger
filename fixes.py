@@ -2,11 +2,13 @@
 # Some entries in the JSON file use one name, while others use other :shrug:
 FIXES = {
     "7 Grand Steps": "7 Grand Steps: What Ancients Begat",
+    "A Virus Named Tom": "A Virus Named TOM",
     "Amnesia: The Dark Descent": "Amnesia: The Dark Descent + Amnesia: A Machine for Pigs",
     "Anomaly Warzone Earth: Mobile Campaign": "Anomaly Warzone Earth",
     "Assault Android Cactus": "Assault Android Cactus+",
     "Automate the Boring Stuff with Python": "Automate the Boring Stuff with Python: Practical Programming for Total Beginners",
     "Brutal Legend": "Brütal Legend",
+    "Day of the Tentacle": "Day of the Tentacle Remastered",
     "Double Fine Adventure Documentary": "Double Fine Adventure",
     "Dusty Revenge: Co-op Edition": "Dusty Revenge: Co-Op Edition",
     "EarthNight Wallpapers": "EarthNight",
@@ -17,7 +19,6 @@ FIXES = {
     "Hot Tin Roof": "Hot Tin Roof: The Cat That Wore A Fedora Deluxe",
     "Ironclad Tactics Deluxe": "Ironclad Tactics",
     "Loot Rascals Soundtrack": "Loot Rascals",
-    "Overgrowth Steam key": "Overgrowth",
     "Q.U.B.E: Director's Cut": "Q.U.B.E.: Director's Cut",
     "Retro Game Crunch (7 game package)": "Retro Game Crunch",
     "Rocket Birds: Hardboiled Chicken": "Rocketbirds: Hardboiled Chicken",

@@ -5,6 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 import json
 from fixes import FIXES
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar
+import re
 
 TYPES_TO_IGNORE = [
     ["video"],  # these are movies
@@ -117,6 +118,7 @@ def detect_type(downloads: list[dict[str, str]]) -> list[str]:
 
 def extract_steam_game(tpkd: dict[str, str]) -> Optional[str]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
+    name = re.sub(r" Steam Key$", "", name)
     is_expired = tpkd["is_expired"]
     key_type = tpkd["key_type"]
     is_steam = key_type == "steam"

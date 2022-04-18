@@ -19,6 +19,7 @@ FIXES = {
     "Hot Tin Roof": "Hot Tin Roof: The Cat That Wore A Fedora Deluxe",
     "Ironclad Tactics Deluxe": "Ironclad Tactics",
     "Loot Rascals Soundtrack": "Loot Rascals",
+    "Overgrowth Steam key": "Overgrowth",
     "Q.U.B.E: Director's Cut": "Q.U.B.E.: Director's Cut",
     "Retro Game Crunch (7 game package)": "Retro Game Crunch",
     "Rocket Birds: Hardboiled Chicken": "Rocketbirds: Hardboiled Chicken",

@@ -7,8 +7,8 @@ A simple way to go from a Humble Bundle collection JSON to a website
 - Install requirements with `pip install -r requirements.txt`
 - If you are planning on contributing, run `pre-commit install`
 - If you want to highlight any entries, create a `recommended.txt` file and put the names of the items
-- If you discover any data duplication, take a look at `fixes.py`, and contribute them to the project!
-- If you discover any non-games showing up as games, add them to `non_games.txt`, and contribute them to the project!
+- If you discover any data duplication, take a look at `name_fixes.py`, and contribute them to the project!
+- If you discover any non-games showing up as games, add them to `type_fixes.py`, and contribute them to the project!
 
 ### Create & Update your catalog
 - Go to your humble bundle library: https://humblebundle.com/home/library

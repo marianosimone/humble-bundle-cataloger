@@ -52,6 +52,7 @@
                 {% if models|length -%}<li><a href="#3DModels">🛠 3D Models</a></li>{% endif -%}
                 {% if soundtracks|length -%}<li><a href="#Soundtracks">🎵 Soundtracks</a></li>{% endif -%}
                 {% if software|length -%}<li><a href="#Software">💻 Software</a></li>{% endif -%}
+                {% if videos|length -%}<li><a href="#Videos">📺 Videos</a></li>{% endif -%}
             </ul>
             If an entry has a ⭐, I've played/seen/read/listened to it and really enjoyed it
 
@@ -169,7 +170,7 @@
         </table>
         {% endif -%}
 
-        {% if models|length -%}
+        {% if soundtracks|length -%}
         <a id="Soundtracks"><h2>🎵 Soundtracks</h2></a>
         <table>
             <thead>
@@ -234,6 +235,39 @@
                     {% endfor -%}
                 </tbody>
             </table>
+        {% endif -%}
+
+        {% if videos|length -%}
+        <a id="Videos"><h2>📺 Videos</h2></a>
+        <table>
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Name</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in videos -%}
+                <tr>
+                    <td>
+                        {% if video.icon -%}
+                            <img src="{{video.icon}}"/>
+                        {% else -%}
+                            <div class="empty_icon"/>
+                        {% endif -%}
+                    </td>
+                    <td>
+                        {% if video.url -%}
+                            <a href="{{video.url}}">{{video.name}}</a>
+                        {% else -%}
+                            {{video.name}}
+                        {% endif -%}
+                        {% if video.recommended -%}⭐{% endif -%}
+                    </td>
+                </tr>
+                {% endfor -%}
+            </tbody>
+        </table>
         {% endif -%}
 
         <footer>

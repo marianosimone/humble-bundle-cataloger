@@ -3,14 +3,12 @@ from functools import reduce
 from itertools import chain
 from jinja2 import Environment, FileSystemLoader
 import json
-from fixes import FIXES
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union
 import re
 
-TYPES_TO_IGNORE = [
-    ["video"],  # these are movies
-    [],  # there are cases which are expired or otherwise unredeemable
-]
+from item_types import Item, Book, Game, Software, PrintableModel, Soundtrack, Video
+from name_fixes import FIXES
+from type_fixes import TYPE_FOR_NAME
 
 
 # This is just my list of recommended entries... Feel free to change it ;)
@@ -22,53 +20,6 @@ except Exception as e:
         "Couldn't find `recommended.txt`, create one if you want to highlight any entries"
     )
     RECOMMENDED = set()
-
-# This are known entries in Humble Bundle that are not games, but Software utils/packages
-try:
-    with open("non_games.txt", "r") as non_games:
-        NON_GAMES = set(map(lambda l: l.strip(), non_games))
-except Exception as e:
-    NON_GAMES = set()
-
-
-class Item:
-    def __init__(self, name, icon, url, recommended):
-        self.name = name
-        self.icon = icon
-        self.url = url
-        self.recommended = recommended
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-
-class Book(Item):
-    def __init__(self, name, icon, url, author, recommended):
-        super().__init__(name, icon, url, recommended)
-        self.author = author
-
-
-class Game(Item):
-    def __init__(self, name, icon, url, recommended, platforms):
-        super().__init__(name, icon, url, recommended)
-        self.platforms = platforms
-
-
-class Software(Item):
-    def __init__(self, name, icon, url, recommended, platforms):
-        super().__init__(name, icon, url, recommended)
-        self.platforms = platforms
-
-
-class Soundtrack(Item):
-    pass
-
-
-class PrintableModel(Item):
-    pass
 
 
 GroupByKey = TypeVar("GroupByKey")
@@ -91,8 +42,12 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
     type_of_item = detect_type(subproduct["downloads"])
     recommended = name in RECOMMENDED
 
-    if type_of_item in TYPES_TO_IGNORE:
+    if (
+        type_of_item == []
+    ):  # there are cases which are expired or otherwise unredeemable
         return None
+    if type_of_item == ["video"]:
+        return Video(name, icon, url, recommended)
     if type_of_item == ["other"]:
         return PrintableModel(name, icon, url, recommended)
     if type_of_item == ["ebook"] or type_of_item == ["audiobook"]:
@@ -105,7 +60,9 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
         set([i for i in type_of_item if i not in ["audio", "ebook", "asmjs"]])
     )
     if platforms:
-        if name in NON_GAMES:
+        if (
+            name in TYPE_FOR_NAME
+        ):  # This assumes that all other mappings would be caught above
             return Software(name, icon, url, recommended, platforms)
         return Game(name, icon, url, recommended, platforms)
     return None
@@ -155,18 +112,15 @@ def get_data() -> dict[Type[Item], list[Item]]:
     for name in extracted_steam_content:
         if not name:
             continue
-        if name in NON_GAMES:
-            content_type: Type[Union[Game, Software]] = Software
-        else:
-            content_type = Game
-        key = (content_type, name)
+        constructor = TYPE_FOR_NAME.get(name, Game)
+        new_entry = constructor(name, "", "", name in RECOMMENDED, ["steam"])
+
+        key = (type(new_entry), name)
         existing = typed_data_by_name.get(key)
         if isinstance(existing, (Game, Software)) and "steam" not in existing.platforms:
             existing.platforms = sorted(existing.platforms + ["steam"])
-        else:
-            typed_data_by_name[key] = content_type(
-                name, "", "", name in RECOMMENDED, ["steam"]
-            )
+        elif not existing:
+            typed_data_by_name[key] = new_entry
 
     return group_by(type, typed_data_by_name.values())
 
@@ -177,11 +131,12 @@ def generate_report(data):
     )
 
     template = env.get_template("template.html").render(
-        books=sorted(set(data[Book]), key=lambda b: b.name),
-        games=sorted(set(data[Game]), key=lambda g: g.name),
-        models=sorted(set(data[PrintableModel]), key=lambda g: g.name),
-        soundtracks=sorted(set(data[Soundtrack]), key=lambda g: g.name),
-        software=sorted(set(data[Software]), key=lambda g: g.name),
+        books=sorted(set(data[Book]), key=lambda i: i.name),
+        games=sorted(set(data[Game]), key=lambda i: i.name),
+        models=sorted(set(data[PrintableModel]), key=lambda i: i.name),
+        soundtracks=sorted(set(data[Soundtrack]), key=lambda i: i.name),
+        software=sorted(set(data[Software]), key=lambda i: i.name),
+        videos=sorted(set(data[Video]), key=lambda i: i.name),
     )
     with open("catalog.html", "w") as file:
         file.write(template)

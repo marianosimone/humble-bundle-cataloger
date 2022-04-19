@@ -4,7 +4,7 @@ from itertools import chain
 from jinja2 import Environment, FileSystemLoader
 import json
 from fixes import FIXES
-from typing import Any, Callable, Iterable, Optional, Type, TypeVar
+from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union
 import re
 
 TYPES_TO_IGNORE = [
@@ -127,7 +127,7 @@ def detect_type(downloads: list[dict[str, Any]]) -> list[str]:
     return platforms
 
 
-def extract_steam_game(tpkd: dict[str, str]) -> Optional[str]:
+def extract_steam_content(tpkd: dict[str, str]) -> Optional[str]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
     name = re.sub(r" Steam Key$", "", name)
     is_expired = tpkd["is_expired"]
@@ -135,7 +135,6 @@ def extract_steam_game(tpkd: dict[str, str]) -> Optional[str]:
     is_steam = key_type == "steam"
     redeemed = "redeemed_key_val" in tpkd
     is_gift = "is_gift" in tpkd
-
     if is_steam and not is_expired and not redeemed and not is_gift:
         return name
     return None
@@ -148,20 +147,26 @@ def get_data() -> dict[Type[Item], list[Item]]:
     subproduct_data = chain.from_iterable(
         map(extract_subproduct, d["subproducts"]) for d in data
     )
-    extracted_steam_games = chain.from_iterable(
-        map(extract_steam_game, d["tpkd_dict"]["all_tpks"]) for d in data
+    extracted_steam_content = chain.from_iterable(
+        map(extract_steam_content, d["tpkd_dict"]["all_tpks"]) for d in data
     )
     typed_data_by_name = {(type(d), d.name): d for d in subproduct_data if d}
 
-    for name in extracted_steam_games:
+    for name in extracted_steam_content:
         if not name:
             continue
-        key = (Game, name)
-        game = typed_data_by_name.get(key)
-        if isinstance(game, Game) and "steam" not in game.platforms:
-            game.platforms = sorted(game.platforms + ["steam"])
+        if name in NON_GAMES:
+            content_type: Type[Union[Game, Software]] = Software
         else:
-            typed_data_by_name[key] = Game(name, "", "", name in RECOMMENDED, ["steam"])
+            content_type = Game
+        key = (content_type, name)
+        existing = typed_data_by_name.get(key)
+        if isinstance(existing, (Game, Software)) and "steam" not in existing.platforms:
+            existing.platforms = sorted(existing.platforms + ["steam"])
+        else:
+            typed_data_by_name[key] = content_type(
+                name, "", "", name in RECOMMENDED, ["steam"]
+            )
 
     return group_by(type, typed_data_by_name.values())
 

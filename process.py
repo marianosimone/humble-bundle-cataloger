@@ -3,7 +3,7 @@ from functools import reduce
 from itertools import chain
 from jinja2 import Environment, FileSystemLoader
 import json
-from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
 import re
 
 from item_types import Item, Book, Game, Software, PrintableModel, Soundtrack, Video
@@ -42,9 +42,8 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
     type_of_item = detect_type(subproduct["downloads"])
     recommended = name in RECOMMENDED
 
-    if (
-        type_of_item == []
-    ):  # there are cases which are expired or otherwise unredeemable
+    if type_of_item == []:
+        # there are cases which are expired or otherwise unredeemable
         return None
     if type_of_item == ["video"]:
         return Video(name, icon, url, recommended)
@@ -60,9 +59,8 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
         set([i for i in type_of_item if i not in ["audio", "ebook", "asmjs"]])
     )
     if platforms:
-        if (
-            name in TYPE_FOR_NAME
-        ):  # This assumes that all other mappings would be caught above
+        if name in TYPE_FOR_NAME:
+            # This assumes that all other mappings would be caught above
             return Software(name, icon, url, recommended, platforms)
         return Game(name, icon, url, recommended, platforms)
     return None
@@ -107,8 +105,20 @@ def get_data() -> dict[Type[Item], list[Item]]:
     extracted_steam_content = chain.from_iterable(
         map(extract_steam_content, d["tpkd_dict"]["all_tpks"]) for d in data
     )
-    typed_data_by_name = {(type(d), d.name): d for d in subproduct_data if d}
 
+    # Try to find cases where there are duplicate entries
+    typed_data_by_name: dict[Tuple[Type[Item], str], Item] = {}
+    for data in subproduct_data:
+        if not data:
+            continue
+        key = (type(data), data.name)
+        existing = typed_data_by_name.get(key)
+        if existing:
+            existing.merge(data)
+        else:
+            typed_data_by_name[key] = data
+
+    # And then, cases where there might be a Steam-only entry
     for name in extracted_steam_content:
         if not name:
             continue

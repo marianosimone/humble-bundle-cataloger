@@ -4,6 +4,7 @@ FIXES: dict[str, str] = {
     "7 Grand Steps": "7 Grand Steps: What Ancients Begat",
     "A Double Fine Adventure Full": "Double Fine Adventure",
     "A Virus Named Tom": "A Virus Named TOM",
+    "AI War: Fleet Command+3 DLCs": "AI War: Fleet Command",
     "Amnesia: The Dark Descent": "Amnesia: The Dark Descent + Amnesia: A Machine for Pigs",
     "Anomaly Warzone Earth: Mobile Campaign": "Anomaly Warzone Earth",
     "Assault Android Cactus": "Assault Android Cactus+",

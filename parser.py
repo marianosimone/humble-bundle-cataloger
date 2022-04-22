@@ -1,7 +1,6 @@
 from collections import defaultdict
 from functools import reduce
 from itertools import chain
-from jinja2 import Environment, FileSystemLoader
 import json
 from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
 import re
@@ -82,7 +81,7 @@ def detect_type(downloads: list[dict[str, Any]]) -> list[str]:
     return platforms
 
 
-def extract_steam_content(tpkd: dict[str, str]) -> Optional[str]:
+def extract_steam_content(tpkd: dict[str, str], include_all: bool) -> Optional[str]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
     name = re.sub(r" Steam Key$", "", name)
     is_expired = tpkd["is_expired"]
@@ -90,12 +89,12 @@ def extract_steam_content(tpkd: dict[str, str]) -> Optional[str]:
     is_steam = key_type == "steam"
     redeemed = "redeemed_key_val" in tpkd
     is_gift = "is_gift" in tpkd
-    if is_steam and not is_expired and not redeemed and not is_gift:
+    if is_steam and not is_expired and (include_all or (not redeemed and not is_gift)):
         return name
     return None
 
 
-def get_data() -> dict[Type[Item], list[Item]]:
+def get_data(include_all: bool) -> dict[Type[Item], list[Item]]:
     with open("humble_catalog.json", "r") as file:
         data = json.load(file).values()
 
@@ -103,7 +102,11 @@ def get_data() -> dict[Type[Item], list[Item]]:
         map(extract_subproduct, d["subproducts"]) for d in data
     )
     extracted_steam_content = chain.from_iterable(
-        map(extract_steam_content, d["tpkd_dict"]["all_tpks"]) for d in data
+        map(
+            lambda tpkd: extract_steam_content(tpkd, include_all),
+            d["tpkd_dict"]["all_tpks"],
+        )
+        for d in data
     )
 
     # Try to find cases where there are duplicate entries
@@ -133,23 +136,3 @@ def get_data() -> dict[Type[Item], list[Item]]:
             typed_data_by_name[key] = new_entry
 
     return group_by(type, typed_data_by_name.values())
-
-
-def generate_report(data):
-    env = Environment(
-        loader=FileSystemLoader("."),
-    )
-
-    template = env.get_template("template.html").render(
-        books=sorted(set(data[Book]), key=lambda i: i.name),
-        games=sorted(set(data[Game]), key=lambda i: i.name),
-        models=sorted(set(data[PrintableModel]), key=lambda i: i.name),
-        soundtracks=sorted(set(data[Soundtrack]), key=lambda i: i.name),
-        software=sorted(set(data[Software]), key=lambda i: i.name),
-        videos=sorted(set(data[Video]), key=lambda i: i.name),
-    )
-    with open("catalog.html", "w") as file:
-        file.write(template)
-
-
-generate_report(get_data())

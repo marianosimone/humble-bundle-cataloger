@@ -81,16 +81,25 @@ def detect_type(downloads: list[dict[str, Any]]) -> list[str]:
     return platforms
 
 
-def extract_steam_content(tpkd: dict[str, str], include_all: bool) -> Optional[str]:
+MARKETPLACES = ["steam", "gog", "rockstar_social"]
+
+
+def extract_marketplace_content(
+    tpkd: dict[str, str], include_all: bool
+) -> Optional[Tuple[str, str]]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
     name = re.sub(r" Steam Key$", "", name)
     is_expired = tpkd["is_expired"]
     key_type = tpkd["key_type"]
-    is_steam = key_type == "steam"
+    is_from_marketplace = key_type in MARKETPLACES
     redeemed = "redeemed_key_val" in tpkd
     is_gift = "is_gift" in tpkd
-    if is_steam and not is_expired and (include_all or (not redeemed and not is_gift)):
-        return name
+    if (
+        is_from_marketplace
+        and not is_expired
+        and (include_all or (not redeemed and not is_gift))
+    ):
+        return (name, key_type)
     return None
 
 
@@ -101,9 +110,9 @@ def get_data(include_all: bool) -> dict[Type[Item], list[Item]]:
     subproduct_data = chain.from_iterable(
         map(extract_subproduct, d["subproducts"]) for d in data
     )
-    extracted_steam_content = chain.from_iterable(
+    extracted_marketplace_content = chain.from_iterable(
         map(
-            lambda tpkd: extract_steam_content(tpkd, include_all),
+            lambda tpkd: extract_marketplace_content(tpkd, include_all),
             d["tpkd_dict"]["all_tpks"],
         )
         for d in data
@@ -121,17 +130,22 @@ def get_data(include_all: bool) -> dict[Type[Item], list[Item]]:
         else:
             typed_data_by_name[key] = data
 
-    # And then, cases where there might be a Steam-only entry
-    for name in extracted_steam_content:
-        if not name:
+    # And then, cases where there might be a Marketplace-only entry
+    for content in extracted_marketplace_content:
+        if not content:
             continue
+        name, marketplace = content
+
         constructor = TYPE_FOR_NAME.get(name, Game)
-        new_entry = constructor(name, "", "", name in RECOMMENDED, ["steam"])
+        new_entry = constructor(name, "", "", name in RECOMMENDED, [marketplace])
 
         key = (type(new_entry), name)
         existing = typed_data_by_name.get(key)
-        if isinstance(existing, (Game, Software)) and "steam" not in existing.platforms:
-            existing.platforms = sorted(existing.platforms + ["steam"])
+        if (
+            isinstance(existing, (Game, Software))
+            and marketplace not in existing.platforms
+        ):
+            existing.platforms = sorted(existing.platforms + [marketplace])
         elif not existing:
             typed_data_by_name[key] = new_entry
 

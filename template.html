@@ -61,12 +61,12 @@
         {% if games|length -%}
             <a id="Games"><h2>🕹 Games</h2></a>
             <ul>
-                <li>If a game has a <img class="platform" src="img/steam.svg"/>, it means that I have a Steam key (but you'll have to check Steam to know compatibility)</li>
+                <li>If a game has a <img class="platform" src="img/gog.svg"/> (gog.com), <img class="platform" src="img/rockstar_social.svg"/> (Rockstar Social), <img class="platform" src="img/steam.svg"/> (Steam), it means that I have a key in that marketplace (but you'll have to check there to know compatibility)</li>
                 <li>If a game has platform icon, it means that I have a downloadable version of it in that platform</li>
             </ul>
             Show:
             <a href="#" onClick="filterByPlatform('all');">all</a>,
-            {% for platform in ['android', 'linux', 'mac', 'steam', 'windows'] -%}
+            {% for platform in ['android', 'gog', 'linux', 'mac', 'rockstar_social', 'steam', 'windows'] -%}
                 <img onClick="filterByPlatform('{{platform}}');" class="platform" src="img/{{platform}}.svg"/>
             {% endfor -%}
             <table>
@@ -88,7 +88,7 @@
                             {% endif -%}
                         </td>
                         <td>
-                            <a href="{% if game.url -%}{{game.url}}{% else -%}https://store.steampowered.com/search/?term={{game.name}}{% endif -%}">{{game.name}}</a> {% if game.recommended -%}⭐{% endif -%}
+                            <a href="{% if game.url -%}{{game.url}}{% elif 'gog' in game.platforms -%}https://www.gog.com/en/games?query={{game.name}}{% elif 'rockstar_social' in game.platforms -%}https://socialclub.rockstargames.com/games{% elif 'steam' in game.platforms -%}https://store.steampowered.com/search/?term={{game.name}}{% else -%}https://www.google.com/search?q=game+{{game.name}}{% endif -%}">{{game.name}}</a> {% if game.recommended -%}⭐{% endif -%}
                         </td>
                         <td>
                             {% for p in game.platforms -%}

@@ -3,7 +3,15 @@
 import argparse
 from parser import get_data
 from jinja2 import Environment, FileSystemLoader
-from item_types import Book, Game, Software, PrintableModel, Soundtrack, Video
+from item_types import (
+    Book,
+    DevelopmentTool,
+    Game,
+    Software,
+    PrintableModel,
+    Soundtrack,
+    Video,
+)
 
 
 def generate_report(data):
@@ -13,6 +21,7 @@ def generate_report(data):
 
     template = env.get_template("template.html").render(
         books=sorted(set(data[Book]), key=lambda i: i.name),
+        development_tools=sorted(set(data[DevelopmentTool]), key=lambda i: i.name),
         games=sorted(set(data[Game]), key=lambda i: i.name),
         models=sorted(set(data[PrintableModel]), key=lambda i: i.name),
         soundtracks=sorted(set(data[Soundtrack]), key=lambda i: i.name),

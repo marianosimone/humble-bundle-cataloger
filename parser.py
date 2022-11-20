@@ -5,7 +5,16 @@ import json
 from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
 import re
 
-from item_types import Item, Book, Game, Software, PrintableModel, Soundtrack, Video
+from item_types import (
+    Item,
+    Book,
+    DevelopmentTool,
+    Game,
+    Software,
+    PrintableModel,
+    Soundtrack,
+    Video,
+)
 from name_fixes import FIXES
 from type_fixes import TYPE_FOR_NAME
 
@@ -57,10 +66,11 @@ def extract_subproduct(subproduct: dict[str, Any]) -> Optional[Item]:
     platforms = sorted(
         set([i for i in type_of_item if i not in ["audio", "ebook", "asmjs"]])
     )
+
     if platforms:
         if name in TYPE_FOR_NAME:
-            # This assumes that all other mappings would be caught above
-            return Software(name, icon, url, recommended, platforms)
+            # This assFmes that all other mappings would be caught above
+            return TYPE_FOR_NAME[name](name, icon, url, recommended, platforms)
         return Game(name, icon, url, recommended, platforms)
     return None
 
@@ -81,12 +91,13 @@ def detect_type(downloads: list[dict[str, Any]]) -> list[str]:
     return platforms
 
 
-MARKETPLACES = ["steam", "gog", "rockstar_social"]
+MARKETPLACES = ["external_key", "generic", "gog", "rockstar_social", "steam"]
+NON_PLATFORM_MARKETPLACES = ["external_key", "generic"]
 
 
 def extract_marketplace_content(
     tpkd: dict[str, str], include_all: bool
-) -> Optional[Tuple[str, str]]:
+) -> Optional[Tuple[str, list[str]]]:
     name = FIXES.get(tpkd["human_name"], tpkd["human_name"])
     name = re.sub(r" Steam Key$", "", name)
     is_expired = tpkd["is_expired"]
@@ -99,7 +110,12 @@ def extract_marketplace_content(
         and not is_expired
         and (include_all or (not redeemed and not is_gift))
     ):
-        return (name, key_type)
+        platforms = []
+        if key_type not in NON_PLATFORM_MARKETPLACES:
+            platforms.append(key_type)
+        if tpkd["machine_name"].endswith("_unity"):
+            platforms.append("unity")
+        return (name, platforms)
     return None
 
 
@@ -134,18 +150,17 @@ def get_data(include_all: bool) -> dict[Type[Item], list[Item]]:
     for content in extracted_marketplace_content:
         if not content:
             continue
-        name, marketplace = content
+        name, platforms = content
 
         constructor = TYPE_FOR_NAME.get(name, Game)
-        new_entry = constructor(name, "", "", name in RECOMMENDED, [marketplace])
+        new_entry = constructor(name, "", "", name in RECOMMENDED, platforms)
 
         key = (type(new_entry), name)
         existing = typed_data_by_name.get(key)
-        if (
-            isinstance(existing, (Game, Software))
-            and marketplace not in existing.platforms
-        ):
-            existing.platforms = sorted(existing.platforms + [marketplace])
+        if isinstance(existing, (Game, Software, DevelopmentTool)) and set(
+            platforms
+        ) - set(existing.platforms):
+            existing.platforms = sorted(set(existing.platforms) | set(platforms))
         elif not existing:
             typed_data_by_name[key] = new_entry
 

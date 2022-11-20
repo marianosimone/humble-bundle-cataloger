@@ -42,6 +42,7 @@ FIXES: dict[str, str] = {
     "Ironclad Tactics Deluxe": "Ironclad Tactics",
     "Loot Rascals Soundtrack": "Loot Rascals",
     "Overgrowth Steam key": "Overgrowth",
+    "PDF-Suite": "PDF-Suite Standard",
     "Q.U.B.E: Director's Cut": "Q.U.B.E.: Director's Cut",
     "Retro Game Crunch (7 game package)": "Retro Game Crunch",
     "Rocket Birds: Hardboiled Chicken": "Rocketbirds: Hardboiled Chicken",

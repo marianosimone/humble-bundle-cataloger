@@ -52,6 +52,11 @@ class Software(Item):
         self.platforms = sorted(set(self.platforms + other.platforms))
 
 
+class DevelopmentTool(Software):
+    def __init__(self, name, icon, url, recommended, platforms):
+        super().__init__(name, icon, url, recommended, platforms)
+
+
 class PrintableModel(Item):
     pass
 

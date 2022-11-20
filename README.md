@@ -1,6 +1,6 @@
 # Humble Bundle Cataloger
 
-A simple way to go from a Humble Bundle collection JSON to a website
+A simple way to go from a Humble Bundle collection JSON to a website. See it in action on my [own catalog](https://marianosimone.com/catalog)
 
 ## How To Use
 ### Setup

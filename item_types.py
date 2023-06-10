@@ -1,5 +1,10 @@
+from typing import Optional
+
+
 class Item:
-    def __init__(self, name, icon, url, recommended):
+    def __init__(
+        self, name: str, icon: Optional[str], url: Optional[str], recommended: bool
+    ):
         self.name = name
         self.icon = icon
         self.url = url
@@ -9,15 +14,22 @@ class Item:
         self.icon = self.icon or other.icon
         self.url = self.url or other.url
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
 
 class Book(Item):
-    def __init__(self, name, icon, url, author, recommended):
+    def __init__(
+        self,
+        name: str,
+        icon: Optional[str],
+        url: Optional[str],
+        author: str,
+        recommended: bool,
+    ):
         super().__init__(name, icon, url, recommended)
         self.author = author
 
@@ -27,7 +39,14 @@ class Book(Item):
 
 
 class Game(Item):
-    def __init__(self, name, icon, url, recommended, platforms):
+    def __init__(
+        self,
+        name: str,
+        icon: Optional[str],
+        url: Optional[str],
+        recommended: bool,
+        platforms: list[str],
+    ):
         super().__init__(name, icon, url, recommended)
         self.platforms = platforms
 
@@ -43,7 +62,14 @@ class Game(Item):
 
 
 class Software(Item):
-    def __init__(self, name, icon, url, recommended, platforms):
+    def __init__(
+        self,
+        name: str,
+        icon: Optional[str],
+        url: Optional[str],
+        recommended: bool,
+        platforms: list[str],
+    ):
         super().__init__(name, icon, url, recommended)
         self.platforms = platforms
 
@@ -53,7 +79,14 @@ class Software(Item):
 
 
 class DevelopmentTool(Software):
-    def __init__(self, name, icon, url, recommended, platforms):
+    def __init__(
+        self,
+        name: str,
+        icon: Optional[str],
+        url: Optional[str],
+        recommended: bool,
+        platforms: list[str],
+    ):
         super().__init__(name, icon, url, recommended, platforms)
 
 

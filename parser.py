@@ -29,6 +29,14 @@ except Exception as e:
     )
     RECOMMENDED = set()
 
+try:
+    from extra import EXTRAS
+except Exception as e:
+    print(
+        "Couldn't find or load `extras.py, create one if you want to specify entries from other sources"
+    )
+    EXTRAS = []
+
 
 GroupByKey = TypeVar("GroupByKey")
 GroupByType = TypeVar("GroupByType")
@@ -123,8 +131,9 @@ def get_data(include_all: bool) -> dict[Type[Item], list[Item]]:
     with open("humble_catalog.json", "r") as file:
         data = json.load(file).values()
 
-    subproduct_data = chain.from_iterable(
-        map(extract_subproduct, d["subproducts"]) for d in data
+    subproduct_data = chain(
+        chain.from_iterable(map(extract_subproduct, d["subproducts"]) for d in data),
+        EXTRAS,
     )
     extracted_marketplace_content = chain.from_iterable(
         map(
